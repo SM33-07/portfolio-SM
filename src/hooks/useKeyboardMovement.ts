@@ -141,7 +141,7 @@ export function useKeyboardMovement(
           zone.position
         );
 
-      if (distance < 2) {
+      if (distance < 2.5) {
         insideZone = true;
         visitZone(zone.id);
       }

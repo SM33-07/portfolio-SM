@@ -1,18 +1,53 @@
+"use client";
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Mesh } from "three";
 
-export default function AetherCrystal() {
-    const meshRef = useRef<Mesh>(null!);
+type AetherCrystalProps = {
+  position: [number, number, number];
+  color?: string;
+};
 
-    useFrame((_, delta) => {
-        meshRef.current.rotation.y += delta * 1.5
-    });
+export default function AetherCrystal({
+  position,
+  color = "#a855f7",
+}: AetherCrystalProps) {
+  const meshRef = useRef<Mesh>(null!);
 
-    return (
-        <mesh ref={meshRef} rotation={[0, 0, 0]} position={[3, 0.5, 3]}>
-            <octahedronGeometry args={[1, 0]} />
-            <meshStandardMaterial color="#a855f7" />
-        </mesh>
-    );
+  useFrame((_, delta) => {
+    meshRef.current.rotation.y +=
+      delta * 1.5;
+  });
+
+  return (
+    <group position={position}>
+      <mesh>
+        <sphereGeometry
+          args={[1.4, 32, 32]}
+        />
+
+        <meshBasicMaterial
+          color={color}
+          transparent
+          opacity={0.12}
+        />
+      </mesh>
+
+      <mesh
+        ref={meshRef}
+        rotation={[0, 0, 0]}
+        position={[0, 1, 0]}
+      >
+        <octahedronGeometry
+          args={[1, 0]}
+        />
+
+        <meshStandardMaterial
+          color={color}
+          emissive={color}
+          emissiveIntensity={0.8}
+        />
+      </mesh>
+    </group>
+  );
 }

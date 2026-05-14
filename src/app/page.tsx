@@ -8,20 +8,25 @@ import WorldGround from "@/components/WorldGround";
 import Avatar from "@/components/Avatar";
 import GameHUD from "@/components/GameHUD";
 
-const zones = [
-  {
-    id: "The Forge",
+import ZonePanel from "@/components/ZonePanel";
+
+import { ZONES } from "@/data/zones";
+
+const zoneTriggers = ZONES.map(
+  (zone) => ({
+    id: zone.id,
+
     position: new THREE.Vector3(
-      3,
-      0,
-      3
+      zone.position[0],
+      zone.position[1],
+      zone.position[2]
     ),
-  },
-];
+  })
+);
 
 export default function Page() {
   return (
-    <main className="w-screen h-screen">
+    <main className="relative w-screen h-screen">
       <Canvas
         orthographic
         camera={{
@@ -37,14 +42,27 @@ export default function Page() {
           color="#c084fc"
         />
 
-        <AetherCrystal />
-
         <WorldGround />
 
-        <Avatar zones={zones} />
+        {/* Zone Crystals */}
+        {ZONES.map((zone) => (
+          <AetherCrystal
+            key={zone.id}
+            position={[zone.position[0], zone.position[1], zone.position[2]]}
+            color={zone.color}
+          />
+        ))}
+
+        {/* Player */}
+        <Avatar
+          zones={zoneTriggers}
+        />
       </Canvas>
 
+      {/* UI */}
       <GameHUD />
+
+      <ZonePanel />
     </main>
   );
 }
