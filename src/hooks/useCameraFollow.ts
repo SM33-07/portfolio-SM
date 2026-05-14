@@ -6,7 +6,7 @@ const LERP_FACTOR = 0.05;
 export function useCameraFollow(
   groupRef: React.RefObject<THREE.Group | null>
 ) {
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (!groupRef.current) return;
 
     const { camera } = state;
@@ -24,14 +24,14 @@ export function useCameraFollow(
       THREE.MathUtils.lerp(
         camera.position.x,
         targetX,
-        LERP_FACTOR
+        LERP_FACTOR * delta * 60
       );
 
     camera.position.z =
       THREE.MathUtils.lerp(
         camera.position.z,
         targetZ,
-        LERP_FACTOR
+        LERP_FACTOR * delta * 60
       );
 
     // Fixed height
