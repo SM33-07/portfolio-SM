@@ -1,87 +1,146 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 interface GameState {
   level: number;
   currentXP: number;
   xpToNextLevel: number;
+
+  // Array instead of Set
   visitedZones: string[];
+
   currentZone: string | null;
 }
 
 interface GameStore extends GameState {
   gainXP: (amount: number) => void;
-  visitZone: (zoneId: string) => void;
+
+  visitZone: (
+    zoneId: string
+  ) => void;
+
   setCurrentZone: (
     zoneId: string | null
   ) => void;
 }
 
-export const useGameStore = create<GameStore>(
-  (set, get) => ({
-    level: 1,
-    currentXP: 0,
-    xpToNextLevel: 100,
-    visitedZones: [],
-    currentZone: null,
+export const useGameStore =
+  create<GameStore>()(
+    persist(
+      (set, get) => ({
+        level: 1,
 
-    gainXP: (amount: number) => {
-      const {
-        currentXP,
-        xpToNextLevel,
-        level,
-      } = get();
+        currentXP: 0,
 
-      const newXP = currentXP + amount;
+        xpToNextLevel: 100,
 
-      if (newXP >= xpToNextLevel) {
-        const overflow =
-          newXP - xpToNextLevel;
+        visitedZones: [],
 
-        set({
-          level: level + 1,
-          currentXP: overflow,
-          xpToNextLevel: Math.floor(
-            xpToNextLevel * 1.5
-          ),
-        });
-      } else {
-        set({
-          currentXP: newXP,
-        });
-      }
-    },
+        currentZone: null,
 
-    visitZone: (zoneId: string) => {
-      const {
-        visitedZones,
-        gainXP,
-      } = get();
+        gainXP: (
+          amount: number
+        ) => {
+          const {
+            currentXP,
+            xpToNextLevel,
+            level,
+          } = get();
 
-      const alreadyVisited =
-        visitedZones.includes(zoneId);
+          const newXP =
+            currentXP + amount;
 
-      if (!alreadyVisited) {
-        set({
-          visitedZones: [
-            ...visitedZones,
-            zoneId,
-          ],
-          currentZone: zoneId,
-        });
+          if (
+            newXP >=
+            xpToNextLevel
+          ) {
+            const overflow =
+              newXP -
+              xpToNextLevel;
 
-        gainXP(30);
-      } else {
-        set({
-          currentZone: zoneId,
-        });
-      }
-    },
+            set({
+              level: level + 1,
 
-    setCurrentZone: (
-      zoneId: string | null
-    ) =>
-      set({
-        currentZone: zoneId,
+              currentXP:
+                overflow,
+
+              xpToNextLevel:
+                Math.floor(
+                  xpToNextLevel *
+                    1.5
+                ),
+            });
+          } else {
+            set({
+              currentXP:
+                newXP,
+            });
+          }
+        },
+
+        visitZone: (
+          zoneId: string
+        ) => {
+          const {
+            visitedZones,
+            gainXP,
+          } = get();
+
+          const alreadyVisited =
+            visitedZones.includes(
+              zoneId
+            );
+
+          if (
+            !alreadyVisited
+          ) {
+            set({
+              visitedZones: [
+                ...visitedZones,
+                zoneId,
+              ],
+
+              currentZone:
+                zoneId,
+            });
+
+            gainXP(30);
+          } else {
+            set({
+              currentZone:
+                zoneId,
+            });
+          }
+        },
+
+        setCurrentZone: (
+          zoneId:
+            | string
+            | null
+        ) =>
+          set({
+            currentZone:
+              zoneId,
+          }),
       }),
-  })
-);
+
+      {
+        name: "aether-realm-save",
+
+        partialize: (
+          state
+        ) => ({
+          level: state.level,
+
+          currentXP:
+            state.currentXP,
+
+          xpToNextLevel:
+            state.xpToNextLevel,
+
+          visitedZones:
+            state.visitedZones,
+        }),
+      }
+    )
+  );
